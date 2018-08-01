@@ -1,6 +1,7 @@
 #[MLFT] Candidate Question1
-#Author:Yi Yang
-#2018/08/01
+#Author: Yi Yang
+#Date: 2018/08/01
+#Version: python 3.5
 import random,queue,time,threading
 class Random_Count_Generator:
     def __init__(self):
@@ -8,7 +9,7 @@ class Random_Count_Generator:
         self.history=queue.Queue(maxsize=100)
         self.probs=[0.5,0.25,0.15,0.05,0.05]
         self.logs=queue.Queue(maxsize=0)
-        self.lock = threading.Lock()
+        self.lock=threading.Lock()
     def print_random_num(self,delay,stop):
         for i in range(100000):
             time.sleep(delay)
@@ -22,10 +23,9 @@ class Random_Count_Generator:
                 if self.history.full():
                     self.history.get()
                 self.history.put(index)      
-                self.logs.put(str(index)+"__"+str(timestamp)+"__"+str(threading.current_thread().name)+"\n")   
+                self.logs.put("Number generated:"+str(index)+"  Time:"+str(timestamp)+"  Thread name:"+str(threading.current_thread().name)+"\n")   
 #            print(index)
-        stop.set() 
-               
+        stop.set()                
     def write_to_disk(self):
         self.file=open("data.txt","a+")
         count=0
@@ -35,8 +35,6 @@ class Random_Count_Generator:
                 self.file.write(text)
                 count+=1
         self.file.close()
-        print ("Count total:",count)
-#        print ("empty?",self.logs.empty())
         self.return_frequency()
     def return_frequency(self):
         count=[0]*5
@@ -55,8 +53,7 @@ class Random_Count_Generator:
         total=sum(count)
         print(total)
         for i in count:
-            print(i/total)
-            
+            print(i/total)            
     def run(self):
         self.stop_event1=threading.Event()
         self.stop_event2=threading.Event()
@@ -74,10 +71,8 @@ class Random_Count_Generator:
         t3.start()
         t4.start()
         t5.start()
-        w.start()
+        w.start()        
         
-        
-
 if __name__ == "__main__":  
     open('data.txt', 'w').close()
     RCG=Random_Count_Generator()
