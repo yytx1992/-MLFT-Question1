@@ -1,4 +1,4 @@
-import random,queue,time
+import random,queue,time,threading
 
 
 class Random_Count_Generator:
@@ -6,58 +6,66 @@ class Random_Count_Generator:
         self.generator=0
         self.history=queue.Queue(maxsize=100)
         self.probs=[0.5,0.25,0.15,0.05,0.05]
-        
+        self.logs=queue.Queue(maxsize=0)
     def print_random_num(self):
         if self.history.full():
             self.history.get()
         r=random.random()
+        timestamp=time.time()
         index=0
         while(r>=0 and index<len(self.probs)):
           r-=self.probs[index]
           index+=1
         self.history.put(index)
-#        print(index)
-        self.write_to_disk(index)
-    def write_to_disk(self,number):
-        self.file=open("data.txt","w+")
+        timestamp=time.time()        
+        print(index)
+        self.logs.put(str(index)+"__"+str(timestamp)+"\n")
+        
+#        self.write_to_disk(index)
+        
+    def write_to_disk(self):
+        self.file=open("data.txt","a+")
 #        print(number)
-        text=str(number)+"__"+str(time.time())+"\n"
+#        text=str(number)+"__"+str(time.time())+"\n"
 #        print(text)
-        self.file.write(text)
+        if not self.logs.empty():
+            text=self.logs.get()
+            self.file.write(text)
         self.file.close()
+        
     def return_frequency(self):
-        count1=0
-        count2=0
-        count3=0
-        count4=0
-        count5=0
-        while self.history.empty()==False:
+        count=[0]*5
+        while not self.history.empty():
             get=self.history.get()
             if get==1:
-                count1+=1
+                count[0]+=1
             elif get==2:
-                count2+=1
+                count[1]+=1
             elif get==3:
-                count3+=1
+                count[2]+=1
             elif get==4:
-                count4+=1
+                count[3]+=1
             elif get==5:
-                count5+=1    
-        self.last=get
-        total=count1+count2+count3+count4+count5
-#        print(total)
-        print (count1/total,count2/total,count3/total,count4/total,count5/total)
+                count[4]+=1           
+#        self.last=get
+        total=sum(count)
+        print(total)
+        for i in count:
+            print(i/total)
 #        print("last:",self.last)
-    
+        
+        
 
+if __name__ == "__main__":  
+    open('data.txt', 'w').close()
+    RCG=Random_Count_Generator()
+    for i in range(101):
+        RCG.print_random_num()
+        RCG.write_to_disk()
+        
+    RCG.return_frequency()
     
-RCG=Random_Count_Generator()
-for i in range(5000):
-    RCG.print_random_num()
-    
-RCG.return_frequency()
-
-#print("$$$$$$$")
-#print(RCG.history.get())
-#print(RCG.history.get())
-#print(RCG.history.get())
+    #print("$$$$$$$")
+    #print(RCG.history.get())
+    #print(RCG.history.get())
+    #print(RCG.history.get())
