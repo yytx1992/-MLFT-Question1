@@ -11,7 +11,7 @@ class Random_Count_Generator:
         self.logs=queue.Queue(maxsize=0)
         self.lock=threading.Lock()
     def print_random_num(self,delay,stop):
-        for i in range(100000):
+        for i in range(2000):
             time.sleep(delay)
             with self.lock:
                 r=random.random()
@@ -35,8 +35,9 @@ class Random_Count_Generator:
                 self.file.write(text)
                 count+=1
         self.file.close()
-        self.return_frequency()
+        print(self.return_frequency())
     def return_frequency(self):
+        fq={}
         count=[0]*5
         while not self.history.empty():
             get=self.history.get()
@@ -51,9 +52,13 @@ class Random_Count_Generator:
             elif get==5:
                 count[4]+=1           
         total=sum(count)
-        print(total)
-        for i in count:
-            print(i/total)            
+#        print("Amount of the last 100 number generated:",total)
+        print ("Frequency percentages of each number for the last 100 numbers:")
+        for idx,val in enumerate(count,start=1):
+            fq[idx]=float(val)/total
+        return fq
+#        for i in count:
+#            print(i/total)            
     def run(self):
         self.stop_event1=threading.Event()
         self.stop_event2=threading.Event()
