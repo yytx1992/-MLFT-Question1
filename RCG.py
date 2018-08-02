@@ -36,35 +36,32 @@ class Write(threading.Thread):#The thread to write into disk
         global history
         global logs 
         self.file=open("data.txt","a+")
-        self.count=0
         self.name=name          
     def run(self):
         try:                
             while True:
                 text=logs.get(True,1)#time_out==1s
                 self.file.write(text)
-                self.count+=1
         except:#All data has been written into the file
-#            print ("Total count:",self.count)
             self.file.close()
             print ("Frequency percentages of each number for the last 100 numbers:",self.return_frequency())
     def return_frequency(self):#Return the frequency percentages of each number for the last 100 numbers
         fq={}
-        self.count=[0]*5
+        count_list=[0]*5
         while not history.empty():
             get=history.get()
             if get==1:
-                self.count[0]+=1
+                count_list[0]+=1
             elif get==2:
-                self.count[1]+=1
+                count_list[1]+=1
             elif get==3:
-                self.count[2]+=1
+                count_list[2]+=1
             elif get==4:
-                self.count[3]+=1
+                count_list[3]+=1
             elif get==5:
-                self.count[4]+=1           
-        total=sum(self.count)      
-        for idx,val in enumerate(self.count,start=1):
+                count_list[4]+=1           
+        total=sum(count_list)      
+        for idx,val in enumerate(count_list,start=1):
             fq[idx]=float(val)/total
         return fq                 
         
