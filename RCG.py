@@ -10,7 +10,7 @@ class Random_Count_Generator:
         self.probs=[0.5,0.25,0.15,0.05,0.05]
         self.logs=queue.Queue(maxsize=0)
         self.lock=threading.Lock()
-    def print_random_num(self,delay,stop):
+    def print_random_num(self,delay):
         for i in range(2000):
             time.sleep(delay)
             with self.lock:
@@ -24,18 +24,19 @@ class Random_Count_Generator:
                     self.history.get()
                 self.history.put(index)      
                 self.logs.put("Number generated:"+str(index)+"  Time:"+str(timestamp)+"  Thread name:"+str(threading.current_thread().name)+"\n")   
-#            print(index)
-        stop.set()                
+#            print(index)               
     def write_to_disk(self):
         self.file=open("data.txt","a+")
         count=0
-        while not (self.logs.empty() and self.stop_event1.is_set() and self.stop_event2.is_set() and self.stop_event3.is_set() and self.stop_event4.is_set() and self.stop_event5.is_set()):
-            while not self.logs.empty():
-                text=self.logs.get()
+        try:                
+            while True:
+                text=self.logs.get(True,1)
                 self.file.write(text)
                 count+=1
-        self.file.close()
-        print(self.return_frequency())
+        except:
+#            print ("Total count:",count)
+            self.file.close()
+            print ("Frequency percentages of each number for the last 100 numbers:",self.return_frequency())
     def return_frequency(self):
         fq={}
         count=[0]*5
@@ -51,25 +52,17 @@ class Random_Count_Generator:
                 count[3]+=1
             elif get==5:
                 count[4]+=1           
-        total=sum(count)
-#        print("Amount of the last 100 number generated:",total)
-        print ("Frequency percentages of each number for the last 100 numbers:")
+        total=sum(count)      
         for idx,val in enumerate(count,start=1):
             fq[idx]=float(val)/total
         return fq
-#        for i in count:
-#            print(i/total)            
+          
     def run(self):
-        self.stop_event1=threading.Event()
-        self.stop_event2=threading.Event()
-        self.stop_event3=threading.Event()
-        self.stop_event4=threading.Event()
-        self.stop_event5=threading.Event()
-        t1=threading.Thread(target=self.print_random_num,name="t1",args=(0,self.stop_event1))
-        t2=threading.Thread(target=self.print_random_num,name="t2",args=(0,self.stop_event2))
-        t3=threading.Thread(target=self.print_random_num,name="t3",args=(0,self.stop_event3))
-        t4=threading.Thread(target=self.print_random_num,name="t4",args=(0,self.stop_event4))
-        t5=threading.Thread(target=self.print_random_num,name="t5",args=(0,self.stop_event5))    
+        t1=threading.Thread(target=self.print_random_num,name="t1",args=(0,))
+        t2=threading.Thread(target=self.print_random_num,name="t2",args=(0,))
+        t3=threading.Thread(target=self.print_random_num,name="t3",args=(0,))
+        t4=threading.Thread(target=self.print_random_num,name="t4",args=(0,))
+        t5=threading.Thread(target=self.print_random_num,name="t5",args=(0,))    
         w=threading.Thread(target=self.write_to_disk,name="w")
         t1.start()
         t2.start()
