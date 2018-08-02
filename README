@@ -1,1 +1,28 @@
-My Project
+This is -MLFT-Candidate Question 1.
+
+Random Count Generator 
+Part1: 
+  Create a function that prints a random number between 1 and 5 to stdout (or console). The probability distribution of the numbers should be as follows: 
+  1 - 50% 2 - 25% 3 - 15% 4 - 5% 5 - 5% 
+  Or roughly that (no need to worry about rounding errors, etc) 
+Part2: 
+  Change the function to a method, add a class member that stores a history of the last 100 numbers, and a function to return the frequency percentages of each number. 
+Part3: 
+  Create a method that reads the most recently generated random number and the current time and writes them both to disk on one line. 
+Part4: 
+  Modify the writer function so it is launched in a different thread. The random number generator should put the numbers and timestamps into a queue that the writer function uses to write its output to disk. 
+Part5:  
+  Modify the program so it has 5 copies of the random number function running concurrently in different threads. They should all feed the single writer thread counts and timestamps, and the writer should ensure they are written in chronological order. 
+ 
+
+The code is witten in Python 3.5. Simply download and run it!
+
+Default: 
+  Each of the 5 threads will generate 2000 numbers with delay 0s(You can change both the parameters to test its robustness).
+When running the code: 
+  A text file named "data" will be generated which stores all the numbers generated with their timestamps and the thread names they belong to(for convenience).
+  The frequency percentage of each number for the last 100 numbers will be printed out(In Part4 I am not sure if you want us to use the queue in part2 or create a new queue. I created a new queue for part4, let me know if you want me to modify it).
+
+Thank you!
+
+
