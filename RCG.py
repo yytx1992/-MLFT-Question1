@@ -5,7 +5,6 @@
 import random,queue,time,threading
 class Random_Count_Generator:
     def __init__(self):
-        self.generator=0
         self.history=queue.Queue(maxsize=100)#The queue to store the most last 100 numbers, used in part 2
         self.probs=[0.5,0.25,0.15,0.05,0.05]
         self.logs=queue.Queue(maxsize=0)#The queue to store numbers, timestamps and the thread name(for convenience)
