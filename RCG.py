@@ -10,6 +10,7 @@ class Random_Count_Generator(threading.Thread):#The thread to generate numbers
         threading.Thread.__init__(self)
         global history
         global logs
+        global lock
         self.name=name
         self.probs=[0.5,0.25,0.15,0.05,0.05]
         self.lock=threading.Lock()
@@ -17,18 +18,20 @@ class Random_Count_Generator(threading.Thread):#The thread to generate numbers
     def run(self):
         for i in range(2000):#Assume each thread will generate 2000 numbers
             time.sleep(self.delay)
-            with self.lock:
-                r=random.random()
-                timestamp=time.time()
-                index=0
-                while(r>=0 and index<len(self.probs)):
-                  r-=self.probs[index]
-                  index+=1
-                if history.full():
-                    history.get()
-                history.put(index)      
-                logs.put("Number generated:"+str(index)+"  Time:"+str(timestamp)+"  Thread name:"+str(threading.current_thread().name)+"\n")      
-#            print(index)   
+            lock.acquire()
+            r=random.random()
+            timestamp=time.time()
+            index=0
+            while(r>=0 and index<len(self.probs)):
+              r-=self.probs[index]
+              index+=1
+            if history.full():
+                history.get()
+            history.put(index)
+            logs.put("Number generated:"+str(index)+"  Time:"+str(timestamp)+"  Thread name:"+str(threading.current_thread().name)+"\n")
+            lock.release()
+
+#            print(index)
                 
 class Write(threading.Thread):#The thread to write into disk
     def __init__(self,name):
@@ -67,6 +70,7 @@ class Write(threading.Thread):#The thread to write into disk
         
 if __name__ == "__main__":  
     open('data.txt', 'w').close()
+    lock = threading.Lock()
     history=queue.Queue(maxsize=100)#The queue to store the most last 100 numbers, used in part 2
     logs=queue.Queue(maxsize=0)#The queue to store numbers, timestamps and the thread name(for convenience)
     thread1=Random_Count_Generator("Thread-1",0)#Assume the delay time for each generation is 0s
